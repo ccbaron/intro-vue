@@ -2,31 +2,80 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Counter Project</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-    integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
-    crossorigin="anonymous" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <main>
-    <div>
-      <h1>Counter</h1>
-      <span class="value">0</span>
-      <div>
-        <button class="btn btn-danger decrease" ><i class="fa fa-minus" aria-hidden="true"></i></button>
-        <button class="btn btn-secondary reset">Reset</button>
-        <button class="btn btn-success increase"><i class="fa fa-plus" aria-hidden="true"></i></button>
-      </div>
+    <div id="app">
+        <h1>Rock Paper Scissors Game</h1>
+        <p>Choose your move:</p>
+        <div class="buttons">
+            <button @click="handleMoveSelection('rock')" id="rock">&#x1F44A;</button>
+            <button @click="handleMoveSelection('paper')" id="paper">&#x1f590;</button>
+            <button @click="handleMoveSelection('scissors')" id="scissors">&#x270c;</button>
+        </div>
+        <p id="result">You chose <em>{{ lastPlayerMove }}</em>, and AI chose  <em> {{ lastAIMove }}</em></p>
+        <p id="scores">
+            Your score: <span id="user-score">{{ playerWins }}</span>
+            Computer score: <span id="computer-score">{{ aiWins }} </span>
+        </p>
     </div>
-  </main>
-    <!-- Aquí va VUE...pero recuerda también el contenedor id="app" -->
 
+    <script type="module">
+        import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+        // possible moves
+        const beats = {
+            rock: 'scissors',
+            paper: 'rock',
+            scissors: 'paper'
+        };
+
+        // Returns 'player', 'ai' or 'draw'
+        const getWinner = (playerMove, aiMove) => {
+            if (playerMove === aiMove) return 'draw';
+            return beats[playerMove] === aiMove ? 'player' : 'ai';
+        };
+
+        const getAIRandomMove = () => {
+            const moves = Object.keys(beats);
+            const index = Math.floor(Math.random() * moves.length);
+            return moves[index];
+        }
+
+        createApp({
+            setup() {
+                const aiWins = ref(0);
+                const lastAIMove = ref('');
+
+                const playerWins = ref(0);
+                const lastPlayerMove = ref('');
+
+                const handleMoveSelection = (move) => {
+                    lastPlayerMove.value = move;
+                    lastAIMove.value = getAIRandomMove();
+                    const result = getWinner(lastPlayerMove.value, lastAIMove.value);
+                    if (result === 'player') {
+                        playerWins.value++;
+                    } else if (result === 'ai') {
+                        aiWins.value++;
+                    }
+                }
+
+                return {
+                    aiWins,
+                    playerWins,
+                    handleMoveSelection,
+                    lastAIMove,
+                    lastPlayerMove,
+                }
+            }
+        }).mount('#app')
+    </script>
 </body>
 
 </html>
